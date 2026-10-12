@@ -6,8 +6,9 @@ course.schedule_overrides, sessions[], missed_days[], replans[]) and prints a JS
 
 deficit_hours counts only days after the latest replans[].absorbed_through, so hours a re-plan
 already absorbed don't trigger another one. raw_deficit_hours is the gap since the course start.
-unclosed_sessions lists past days whose session was never closed (status not "done", or no
-actual_hours). Those count as 0 h done, so close them before trusting deficit_hours.
+unclosed_sessions lists past days whose session was never closed (status not "done" or "paused",
+or no actual_hours). Those count as 0 h done, so close them before trusting deficit_hours.
+paused_sessions lists days whose session is paused (today included); their hours so far count.
 
     python3 tools/course_calendar.py                 # today
     python3 tools/course_calendar.py --date 2026-10-20 --compact
@@ -95,9 +96,11 @@ def summarize(progress: dict, today: date) -> dict:
         {
             s["date"]
             for s in sessions
-            if s["date"] < today.isoformat() and (s.get("status") != "done" or s.get("actual_hours") is None)
+            if s["date"] < today.isoformat()
+            and (s.get("status") not in ("done", "paused") or s.get("actual_hours") is None)
         }
     )
+    paused = sorted({s["date"] for s in sessions if s.get("status") == "paused"})
 
     remaining_from = max(today, start)
     remaining_by_week = []
@@ -138,6 +141,7 @@ def summarize(progress: dict, today: date) -> dict:
         "absorbed_through": after or None,
         "deficit_hours": round(planned_unabsorbed - done_unabsorbed, 2),
         "unclosed_sessions": unclosed,
+        "paused_sessions": paused,
         "remaining_hours_including_today": sum(r["remaining_hours"] for r in remaining_by_week),
         "remaining_by_week": remaining_by_week,
     }

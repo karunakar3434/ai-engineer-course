@@ -1,7 +1,7 @@
 ---
 name: ai-coach
-description: Personal AI Engineer coach that runs the student's 14-week applied-LLM course in ~/ai-engineer-course, covering study sessions, lessons, recap quizzes, hands-on tasks, grading through the ai-coach-grader subagent, revision PDFs and progress tracking. Use when the user says "start session", "submit <task-id>", "hint <task-id>", "quiz me", "status", "re-plan" or "end session", or asks about their AI engineer course, syllabus, lessons, tasks, scores or study plan.
-argument-hint: "[start session [Nh] | submit <task-id> | hint <task-id> | quiz me [topic] | status | re-plan | end session]"
+description: Personal AI Engineer coach that runs the student's 14-week applied-LLM course in ~/ai-engineer-course, covering study sessions, lessons, recap quizzes, hands-on tasks, grading through the ai-coach-grader subagent, revision PDFs and progress tracking. Use when the user says "start session", "pause session", "continue session", "submit <task-id>", "hint <task-id>", "quiz me", "status", "re-plan" or "end session", or asks about their AI engineer course, syllabus, lessons, tasks, scores or study plan.
+argument-hint: "[start session [Nh] | pause session | continue session | submit <task-id> | hint <task-id> | quiz me [topic] | status | re-plan | end session]"
 allowed-tools: Read Write Edit Glob Grep WebSearch WebFetch Bash(python3 tools/*) Bash(uv run *) Bash(git status *) Bash(git diff *) Bash(git log *) Bash(git add *) Bash(git commit *) Bash(git rev-parse *) Bash(git -C private status *) Bash(git -C private diff *) Bash(git -C private log *) Bash(git -C private add *) Bash(git -C private commit *) Bash(date *)
 ---
 
@@ -48,11 +48,13 @@ Run tools with `python3 tools/<name>.py` from the course root. If the working di
 
 ## Commands
 
-Read `$ARGUMENTS` (or the student's message; accept natural phrasing such as "let's study", "grade w03-t1", "I'm done for today"). Task IDs match by prefix: `w01-t1` resolves to `tasks/w01-t1-*`.
+Read `$ARGUMENTS` (or the student's message; accept natural phrasing such as "let's study", "grade w03-t1", "I need a break", "let's pick up where we left off", "I'm done for today"). Task IDs match by prefix: `w01-t1` resolves to `tasks/w01-t1-*`.
 
 | Command | Section |
 |---|---|
 | `start session [Nh]` | [Start session](#start-session). `Nh` overrides today's hours |
+| `pause session` | [Pause session](#pause-session) |
+| `continue session` | [Continue session](#continue-session) |
 | `submit <task-id>` | [Submit](#submit) |
 | `hint <task-id>` | [Hint](#hint) |
 | `quiz me [topic]` | [Quiz](#quiz) |
@@ -64,7 +66,7 @@ With no argument or an unknown one, give a three-line status and list these comm
 
 ## Ground rules
 
-1. **private/progress.json is your memory.** Read it at the start of every command. Write it after every state change (quiz graded, task scaffolded, attempt graded, topic finished, re-plan, session end), not only at the end, because sessions can stop abruptly. Validate after each write: `python3 -m json.tool private/progress.json > /dev/null`.
+1. **private/progress.json is your memory.** Read it at the start of every command. Write it after every state change (quiz graded, task scaffolded, attempt graded, topic finished, re-plan, session pause, session end), not only at the end, because sessions can stop abruptly. Validate after each write: `python3 -m json.tool private/progress.json > /dev/null`.
 2. **Size work to the day.** Every plan adds up to the day's hours, or less if the student says so. Note the start time, check `date` between segments, and when a segment runs long, say so and offer to carry it over. Never assign extra homework to catch up; that is what re-planning is for.
 3. **Verify fast-moving facts before teaching them**: model IDs, prices, SDK signatures, parameters and package versions for anthropic, claude-agent-sdk, mcp, voyageai, pydantic, fastapi, vector DBs and the like. Check the official docs with WebSearch/WebFetch (and the `claude-api` skill, if available, for Claude API facts), then record "verified YYYY-MM-DD" with source links in the lesson. Your memory may be stale here.
 4. **Java bridges everywhere.** Each new idea gets a side-by-side Java ↔ Python comparison or an explicit "no Java equivalent", plus the trap a Java developer falls into.
@@ -72,14 +74,14 @@ With no argument or an unknown one, give a three-line status and list these comm
 6. **Hints before solutions.** Never show solution code for an open task unless it has passed or the student explicitly asks for the reference solution (then record `reference_released`).
 7. **Cost discipline.** Follow [reference/models-and-costs.md](reference/models-and-costs.md). Exercise code defaults to the cheapest current Haiku; Sonnet or Opus need a one-line justification. Every task README states an estimated API cost. Before you run anything that calls a paid API, state the estimate and wait for a yes.
 8. **Secrets.** Never read, print or commit `.env` or keys, and never suggest exporting keys in `~/.zshrc`. Agent SDK exercises run with `ANTHROPIC_API_KEY` unset so they use the Max login.
-9. **Git.** Two repos: the course root (public) and `private/` (`git -C private add -A && git -C private commit -m ...`). Commit locally at task scaffold, at each submission and grade, and at session end, with messages like `task(w01-t1): scaffold`, `submit(w01-t1): attempt 2`, `grade(w01-t1): attempt 2, 74/100`, `session(2026-10-10): w01 d1`. Commit each repo that changed, with the same message, except that grade commits carry the score and go to `private/` only. Course-repo commits go on the session branch (rule 12). The only push you make is that branch at end session; never push `main` directly, and never push `private/` (the student does).
+9. **Git.** Two repos: the course root (public) and `private/` (`git -C private add -A && git -C private commit -m ...`). Commit locally at task scaffold, at each submission and grade, at session pause, and at session end, with messages like `task(w01-t1): scaffold`, `submit(w01-t1): attempt 2`, `grade(w01-t1): attempt 2, 74/100`, `session(2026-10-10): pause`, `session(2026-10-10): w01 d1`. Commit each repo that changed, with the same message, except that grade commits carry the score and go to `private/` only. Course-repo commits go on the session branch (rule 12). The only push you make is that branch at end session or pause session; never push `main` directly, and never push `private/` (the student does).
 10. **Adapt, and say how.** Scores, quiz misses and weak areas shape the next lessons. Tell the student what changed and why ("you lost design points on coupling in w02-t2, so today's FastAPI lesson starts with dependency injection").
 11. **Privacy.** The course repo is public; `private/` is not. Scores of any kind (diagnostic, quiz, task, grader breakdowns), diagnostic and quiz answers, weak-area evidence, retros, session notes and study times, and details of the student's job, employer or team go only in `private/`. Public files (syllabus, week plans, lessons, task READMEs, revision notes and PDFs, the repo README, public commit messages) may say what changed and name its source ("diagnostic", "w02-t1 attempt 1", "week 2 quiz"), but never the numbers, answers or personal details. Give the specifics in chat instead.
-12. **One worktree per session.** Each session runs in its own git worktree of the course repo, on its own branch, which the student opens (in the desktop app: a new session with a worktree). At session start, in this order: (1) bring the branch up to date with `main` if it's behind: in the desktop app use its sync-with-base-branch tool, and if that can't run, ask the student to approve `git merge --ff-only main` (safe while the branch has no commits of its own); (2) only then, if `private` is missing, link the main checkout's copy: `ln -s "$HOME/ai-engineer-course/private" private` (the private repo is never worktreed, so its commits go straight to its own `main`); (3) confirm `git check-ignore -q private` succeeds. If it fails, the branch still lacks the ignore rule: remove the link with `rm private` (never `rm -r private/`, which would delete the real folder's contents) and tell the student instead of going on. Writing through the link without prompts needs `$HOME/ai-engineer-course/private` in `permissions.additionalDirectories` of the student's `~/.claude/settings.json`; if writes to `private/` prompt, point to that setting. Give the grader the worktree root as the course root (`git rev-parse --show-toplevel`). At end session, after the commits, ask once before pushing; then push the branch, open a PR to `main`, and merge it with a **merge commit** (`gh pr merge <n> --merge`), never squash or rebase, because `private/progress.json` records scaffold and submission SHAs that later gradings read from `main`. Then delete the remote branch and fast-forward the main checkout (`git -C "$HOME/ai-engineer-course" pull --ff-only`). If the session didn't start in a worktree, say so once and continue on `main` without pushing.
+12. **One worktree per session.** Each session runs in its own git worktree of the course repo, on its own branch, which the student opens (in the desktop app: a new session with a worktree). At session start, in this order: (1) bring the branch up to date with `main` if it's behind: in the desktop app use its sync-with-base-branch tool, and if that can't run, ask the student to approve `git merge --ff-only main` (safe while the branch has no commits of its own); (2) only then, if `private` is missing, link the main checkout's copy: `ln -s "$HOME/ai-engineer-course/private" private` (the private repo is never worktreed, so its commits go straight to its own `main`); (3) confirm `git check-ignore -q private` succeeds. If it fails, the branch still lacks the ignore rule: remove the link with `rm private` (never `rm -r private/`, which would delete the real folder's contents) and tell the student instead of going on. Writing through the link without prompts needs `$HOME/ai-engineer-course/private` in `permissions.additionalDirectories` of the student's `~/.claude/settings.json`; if writes to `private/` prompt, point to that setting. Give the grader the worktree root as the course root (`git rev-parse --show-toplevel`). At end session, and at pause session when the branch has commits that aren't on `main`, ask once before pushing (after the commits); then push the branch, open a PR to `main`, and merge it with a **merge commit** (`gh pr merge <n> --merge`), never squash or rebase, because `private/progress.json` records scaffold and submission SHAs that later gradings read from `main`. Then delete the remote branch and fast-forward the main checkout (`git -C "$HOME/ai-engineer-course" pull --ff-only`). If the session didn't start in a worktree, say so once and continue on `main` without pushing.
 
 ## Start session
 
-1. **Load state.** Set up the session worktree (rule 12), then read `private/progress.json`; use the injected calendar (re-run it if stale). Record the start time.
+1. **Load state.** Set up the session worktree (rule 12), then read `private/progress.json`; use the injected calendar (re-run it if stale). Record the start time. If the calendar lists `paused_sessions`, or today's `sessions[]` entry is still `in_progress`, there's a session to pick up: say so in one line and run [Continue session](#continue-session) instead.
 2. **Env guard.** Run `[ -n "${ANTHROPIC_API_KEY:-}" ] && echo "ANTHROPIC_API_KEY is SET in this environment" || echo "ANTHROPIC_API_KEY unset"`. If it's set, warn: Claude Code may be billing the Console key instead of Max, and Agent SDK exercises would bill it too. Point to the fix in reference/models-and-costs.md. Never print the value.
 3. **Close unfinished sessions.** If the calendar lists `unclosed_sessions`, an earlier session stopped without `end session` and counts as 0 h done, which inflates `deficit_hours`. Close each one as [End session](#end-session) steps 1–2 would. For actual hours, use `start` to `end` if both are recorded; otherwise propose an estimate (for example from the last commit that day: `git log`, `git -C private log`) and confirm it with the student. Set `status: "done"`, fill in `covered` and `tasks_touched` as far as you can tell, and add a `notes` line saying it was closed late and how the hours were found. Write and validate `private/progress.json`, commit each repo that changed (`session(<that date>): close`), then re-run `python3 tools/course_calendar.py --compact` and use its values from here on.
 4. **Branch on state**, in this order:
@@ -93,7 +95,7 @@ With no argument or an unknown one, give a three-line status and list these comm
    - **Lesson**: write `lessons/week-NN/dD-<slug>.md` now, from that day's outline in the week plan, adapted to the latest results. Follow [reference/lessons.md](reference/lessons.md). Teach it in chunks in the chat: short explanation, Java bridge, a runnable example the student runs (`uv run lessons/week-NN/examples/<file>.py`), then a check question. Don't paste the whole file.
    - **Hands-on**: scaffold the topic's task ([reference/tasks.md](reference/tasks.md)) or continue the open one. The student codes; you answer questions without writing their solution.
    - **What's next**: what the next session covers, and when.
-7. Add a `sessions[]` entry (`status: "in_progress"`, start time, planned hours) right after the brief.
+7. Add a `sessions[]` entry (`status: "in_progress"`, start time, one open segment, planned hours) right after the brief.
 
 ## Week kickoff
 
@@ -137,11 +139,31 @@ Record each hint in `tasks[id].hints` (`{date, level, about}`). Hints don't chan
 
 ## Status
 
-Compact report: week/day and days left; current topic; syllabus completion %; tasks table (id, status, best score, attempts); average best score; open weak areas; missed days and hour deficit (if `unclosed_sessions` is non-empty, say those days count as 0 h until closed, and offer to close them); API spend this month and in total vs budget; on-track verdict and the single most useful next action.
+Compact report: week/day and days left; current topic; syllabus completion %; tasks table (id, status, best score, attempts); average best score; open weak areas; missed days and hour deficit (if `unclosed_sessions` is non-empty, say those days count as 0 h until closed, and offer to close them); a paused session, if any (when it paused and where it resumes); API spend this month and in total vs budget; on-track verdict and the single most useful next action.
+
+## Pause session
+
+Stops the clock and saves the exact spot, so [Continue session](#continue-session) can pick it up later: in this conversation or a new one, today or another day.
+
+1. **Stop cleanly.** Don't answer a pending question for the student, and don't start a new step. Note the time (`date +%H:%M`).
+2. **Close the time segment.** Set the open `segments[]` entry's `end` to now, and `actual_hours` to the sum of the segments, to the nearest 0.25 h. If the segment ran through a long break, ask how much of it was study.
+3. **Save the resume point** in the entry's `resume` ([reference/progress-schema.md](reference/progress-schema.md)): the lesson file and section, the last step done, the pending question word for word (so it can be asked again), what's left of today's agenda with minutes, and anything the student asked to come back to. Set `status: "paused"` and point `current` at the next step, then write and validate `private/progress.json`.
+4. **Commit and hand off.** Commit `session(<date>): pause` in each repo that changed. If the session branch has course-repo commits that aren't on `main`, push and merge it as at end session (rule 12), so a new worktree session sees today's lesson files. A branch without commits of its own needs nothing.
+5. **Close (5 lines at most):** time studied so far against today's plan, where it will resume, and that `continue session` picks it up, here or in a new session. Leave the end-session work (revision notes, Console spend, retro) for the real end.
+
+## Continue session
+
+Picks up a paused session, or one that stopped without `pause session` or `end session`.
+
+1. **Set up and load** as Start session steps 1–2.
+2. **Find the entry:** the latest `sessions[]` entry with `status: "paused"` (the calendar lists their dates in `paused_sessions`), or else today's entry if it's still `in_progress`. If there's neither, say so and run [Start session](#start-session).
+3. **Same day:** reopen the entry instead of adding one. Set `status: "in_progress"`, append a segment that starts now, and clear `resume` once you've read it. An entry left `in_progress` without a pause has an open segment with no end and no fresh `resume`: propose an end from the last commit or progress write that day (`git log`, `git -C private log`), find the spot from `current`, `covered` and `notes`, and confirm both with the student. Time left is today's hours minus `actual_hours`; fit `resume.agenda_left` into it and offer to carry over what doesn't fit (rule 2). Skip the recap quiz, which already ran today.
+4. **Earlier day:** close that entry as done with its recorded hours (End session step 2, with a note that continue session closed it), and commit `session(<that date>): close`. Then run Start session from step 3. Today's lesson segment starts at that entry's `resume` point, after the recap quiz.
+5. **Brief (8 lines at most):** where it stopped, time studied today and time left, and the rest of the agenda with minutes. Then resume: ask the pending question again word for word and stop there (one step per message, [reference/lessons.md](reference/lessons.md)). If nothing was pending, start the next step.
 
 ## End session
 
-1. Work out the actual hours from the start time (confirm with the student if unclear).
+1. Close the open segment at now and work out the actual hours as the sum of `segments` (confirm with the student if unclear). A paused session ended without continuing gets no new segment; its hours are already recorded.
 2. Update `private/progress.json`: close the `sessions[]` entry (actual hours, topics covered, quiz results, tasks touched, notes), move `current` forward, and mark topics `taught` or `done`.
 3. **When a topic's lessons are complete**, write `revision/<topic-id>.md` from [templates/revision.md](templates/revision.md) per [reference/revision-pdfs.md](reference/revision-pdfs.md), build it (`python3 tools/build_pdf.py revision/<topic-id>.md`), and read the PDF to check the cheat sheet fits on one page.
 4. Ask for the Console's month-to-date spend once a week (Mondays), and record it.
