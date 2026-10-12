@@ -2,7 +2,7 @@
 
 ## Triggers
 
-- **Automatic** at session start: the calendar reports `new_missed_days`, or `deficit_hours ≥ 2`.
+- **Automatic** at session start: the calendar reports `new_missed_days`, or `deficit_hours ≥ 2`. `deficit_hours` counts only days after the latest re-plan's `absorbed_through`, so hours already re-planned never trigger another re-plan. `raw_deficit_hours` is the gap since the course start: report it, but don't trigger on it.
 - **Manual**: the student says `re-plan`, or declares future days off or a changed weekly schedule.
 - **Proposed, not automatic**: a P1 task failed twice, or the student is clearly faster or slower than planned. Suggest a re-plan and wait for a yes.
 
@@ -22,7 +22,7 @@
 5. Otherwise apply the absorption order until needed ≤ available. Compressing means: lesson time × 0.5–0.7 (fewer examples; the rest moves to "read on your own if curious", which is optional, not homework); for a task, a smaller scope with fewer acceptance criteria, keeping the core skill.
 6. Rebuild the week-by-week table for the remaining weeks. If the current week's `lessons/week-NN/README.md` exists, update its remaining day plans.
 7. Record and report:
-   - private/progress.json: append to `replans` (`date`, `trigger`, `deficit_hours`, `missed_days`, `cut[]`, `compressed[]`, `moved[]`, `buffer_used_hours`); set `replanned: true` on the missed days it accounted for.
+   - private/progress.json: append to `replans` (`date`, `trigger`, `deficit_hours`, `absorbed_through`, `missed_days`, `cut[]`, `compressed[]`, `moved[]`, `buffer_used_hours`); set `replanned: true` on the missed days it accounted for. `absorbed_through` is the last day whose shortfall this plan absorbs: yesterday when you re-plan before today's session, today when today's hours are already logged (for example at `end session`). Because step 3 counts every unfinished item, a re-plan absorbs the whole shortfall up to that day.
    - syllabus.md: update the affected weeks and add a changelog row.
    - Tell the student in at most 12 lines:
 

@@ -117,6 +117,8 @@ Single source of truth for course state, at `~/ai-engineer-course/private/progre
   "replans": [
     {
       "date": "2026-10-15", "trigger": "missed 2026-10-14", "deficit_hours": 2,
+      "absorbed_through": "2026-10-14",   // last day whose shortfall this plan absorbs
+      "missed_days": ["2026-10-14"],
       "cut": [], "compressed": ["w02-pydantic-fastapi 4.5h → 3.5h"], "moved": [], "buffer_used_hours": 1
     }
   ],
@@ -135,6 +137,7 @@ Single source of truth for course state, at `~/ai-engineer-course/private/progre
 ## Rules
 
 - Append to history arrays (`attempts`, `sessions`, `quiz_history`, `replans`, `missed_days`); never rewrite or delete past entries. Fix mistakes with a new entry or a `notes` field.
+- `replans[].absorbed_through` marks the shortfall up to that day as absorbed: yesterday for a re-plan before today's session, today if today's hours were already logged. `tools/course_calendar.py` reports `deficit_hours` from the days after the latest `absorbed_through` only, plus `raw_deficit_hours` (planned minus done since the start) and `absorbed_through`. An entry without the field counts as absorbing up to the day before its `date`. Same-day re-plans that supersede each other share one `absorbed_through`, so nothing is counted twice.
 - `best_score` is the maximum over attempts. `status: "passed"` requires an attempt with `passed: true`.
 - Tasks with `ai_quality` weight 0 record it as `[0, 0]`.
 - Percentage of syllabus done = topics with status `taught` or `done`, plus passed tasks, divided by all non-cut topics and tasks.
