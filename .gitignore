@@ -21,6 +21,8 @@ htmlcov/
 .usage/
 
 # Personal course state (progress, scores, diagnostic, grading reports): its own private repo
+# (in a session worktree, /private is a symlink to the main checkout's copy)
+/private
 private/
 /progress.json
 

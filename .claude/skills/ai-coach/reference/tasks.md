@@ -84,7 +84,7 @@ On `submit <id>`:
 
    ```
    Grade task <id>, attempt <n>.
-   Course root: <absolute path to ~/ai-engineer-course>
+   Course root: <absolute path of the session worktree root: git rev-parse --show-toplevel>
    Task dir: tasks/<dir>
    Submission commit: <sha>
    Scaffold commit: <scaffold_commit>
