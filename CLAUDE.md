@@ -1,6 +1,6 @@
 # AI Engineer course repo
 
-A 14-week applied AI Engineer course, run by the project-level `/ai-coach` skill (`.claude/skills/ai-coach/`) and graded by the project-level `ai-coach-grader` subagent (`.claude/agents/`). Edit only these copies; there are no user-level copies in `~/.claude`. `private/progress.json` holds all course state; `syllabus.md` holds the plan.
+A 14-week applied AI Engineer course, run by the project-level `/ai-coach` skill (`.claude/skills/ai-coach/`) and graded by the project-level `ai-coach-grader` subagent (`.claude/agents/`). Edit only these copies. If `~/.claude/skills/ai-coach/` or `~/.claude/agents/ai-coach-grader.md` exists, it's a mirror a sync hook keeps identical to the project copy — **never** edit it directly, since that change wouldn't reach this repo and the two copies would drift. Claude Code loads the `~/.claude` skill over the project's when the names match, so if the mirror falls behind (a `git pull` doesn't trigger the hook), sessions run the old coach until it's synced. `private/progress.json` holds all course state; `syllabus.md` holds the plan.
 
 - Python 3.13 with uv. Each task in `tasks/<id>-<slug>/` is its own uv project (src layout, pytest, ruff). Run tests from the task dir with `uv run pytest`.
 - This repo is public on GitHub. `private/` is gitignored and is its own private repo (progress, diagnostic, grading reports, reference solutions). Scores, diagnostic or quiz answers, session notes, study times and job details never go in public files or public commit messages.
