@@ -11,7 +11,7 @@ while IFS= read -r path; do
     .env|*/.env|.env.*|*/.env.*)
       echo "pre-commit: refusing to commit secrets file: $path" >&2
       fail=1 ;;
-    private/*)
+    private|private/*)
       echo "pre-commit: refusing to commit private course state to the public repo: $path" >&2
       fail=1 ;;
   esac

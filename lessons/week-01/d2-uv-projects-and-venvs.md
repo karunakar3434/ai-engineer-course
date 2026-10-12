@@ -48,7 +48,7 @@ uv init --package --python 3.13 hello-uv
 | `pyproject.toml` | Project metadata, dependencies, tool config (ruff, pytest) | `pom.xml` |
 | `.python-version` | Interpreter pin (`3.13`) | `maven.compiler.release` + toolchain |
 | `src/hello_uv/__init__.py` | The package; the folder makes `hello_uv` importable | `src/main/java/com/acme/hello/` |
-| `README.md`, `.gitignore`, `.git/` | As you'd expect | same |
+| `README.md`, `.gitignore`, `.git/` | As you'd expect (`.git/` and `.gitignore` are skipped when the folder is already inside a git repo, as `playground/` is) | same |
 | `uv.lock` *(after the first `uv add`/`uv run`)* | Exact resolved versions + hashes of every transitive dependency | no default equivalent (closest: dependency lock plugins, Gradle lockfiles) |
 | `.venv/` *(after the first `uv run`/`uv sync`)* | The project's private interpreter + installed packages | your classpath + `~/.m2` cache, combined, per project |
 
@@ -125,7 +125,7 @@ Where the analogy breaks: Maven pins **exact** versions in the POM, and transiti
 | `uv lock --check` | Fail if `uv.lock` is stale (CI and pre-submit check) | `mvn enforcer` |
 | `uv lock --upgrade-package httpx` | Bump one package | `versions:use-latest-versions` for one artifact |
 
-**Run it:** in `hello-uv`, `uv add httpx` and then `uv add --dev pytest ruff`. Then `git diff pyproject.toml` and `grep -c '^\[\[package\]\]' uv.lock`. Look for: three direct dependencies in `pyproject.toml`, but many more packages in the lockfile (the transitive tree).
+**Run it:** in `hello-uv`, `uv add httpx` and then `uv add --dev pytest ruff`. Then `cat pyproject.toml` (`playground/` is gitignored, so `git diff` shows nothing) and `grep -c '^\[\[package\]\]' uv.lock`. Look for: three direct dependencies in `pyproject.toml`, but many more packages in the lockfile (the transitive tree).
 
 **Check:** a teammate clones your repo with `pyproject.toml` but you forgot to commit `uv.lock`. What could differ on their machine?
 

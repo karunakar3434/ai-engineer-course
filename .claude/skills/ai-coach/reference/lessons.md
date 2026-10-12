@@ -46,6 +46,7 @@ Depth calibration: skip anything a senior Java engineer already knows (what a lo
 
 - Small chunks: at most about 25 lines of explanation before the student does something (runs, predicts, answers, edits).
 - Ask "predict the output" before running examples; prediction errors are the best teaching moments.
+- **One step per message, gated on predictions.** A message that asks for a prediction ends there: no commands, no next step, no next section. After the student answers, check the prediction first, then give the command(s) and stop. After they run them, explain the output, then ask the next prediction. Never re-post steps the student hasn't reached; if they re-run an earlier step, respond only to what they ran.
 - Socratic for concepts, direct for syntax.
 - When the student is stuck, ask what they've tried and what they expected before explaining.
 - Watch the clock: at segment boundaries, check `date` against the agenda and say if you're over.
