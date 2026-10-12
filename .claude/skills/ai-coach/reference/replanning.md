@@ -2,7 +2,7 @@
 
 ## Triggers
 
-- **Automatic** at session start: the calendar reports `new_missed_days`, or `deficit_hours ≥ 2`. `deficit_hours` counts only days after the latest re-plan's `absorbed_through`, so hours already re-planned never trigger another re-plan. `raw_deficit_hours` is the gap since the course start: report it, but don't trigger on it.
+- **Automatic** at session start: the calendar reports `new_missed_days`, or `deficit_hours ≥ 2`. `deficit_hours` counts only days after the latest re-plan's `absorbed_through`, so hours already re-planned never trigger another re-plan. `raw_deficit_hours` is the gap since the course start: report it, but don't trigger on it. Close any `unclosed_sessions` first (SKILL.md, Start session step 3) and re-run the calendar: an unclosed session counts as 0 h done, so the deficit it causes isn't real yet.
 - **Manual**: the student says `re-plan`, or declares future days off or a changed weekly schedule.
 - **Proposed, not automatic**: a P1 task failed twice, or the student is clearly faster or slower than planned. Suggest a re-plan and wait for a yes.
 
@@ -15,7 +15,7 @@
 
 ## Procedure
 
-1. Run `python3 tools/course_calendar.py` to get `remaining_by_week` and the deficit.
+1. Run `python3 tools/course_calendar.py` to get `remaining_by_week` and the deficit. If it lists `unclosed_sessions`, close them first (SKILL.md, Start session step 3) and run it again.
 2. **Available** = remaining hours × 0.92 (keep slack).
 3. **Needed** = the sum of hours of unfinished syllabus items (topics plus tasks; in-progress items count their remaining share).
 4. If needed ≤ available: shift items forward and shrink the buffer. Done.

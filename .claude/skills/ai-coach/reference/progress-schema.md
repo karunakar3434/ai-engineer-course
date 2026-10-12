@@ -138,6 +138,7 @@ Single source of truth for course state, at `~/ai-engineer-course/private/progre
 
 - Append to history arrays (`attempts`, `sessions`, `quiz_history`, `replans`, `missed_days`); never rewrite or delete past entries. Fix mistakes with a new entry or a `notes` field.
 - `replans[].absorbed_through` marks the shortfall up to that day as absorbed: yesterday for a re-plan before today's session, today if today's hours were already logged. `tools/course_calendar.py` reports `deficit_hours` from the days after the latest `absorbed_through` only, plus `raw_deficit_hours` (planned minus done since the start) and `absorbed_through`. An entry without the field counts as absorbing up to the day before its `date`. Same-day re-plans that supersede each other share one `absorbed_through`, so nothing is counted twice.
+- A `sessions[]` entry stays `in_progress` with `actual_hours: null` until `end session` closes it. If a session stops without one, the calendar counts that day as 0 h done and lists its date in `unclosed_sessions` (past entries whose `status` isn't `done` or whose `actual_hours` is null). Start session closes those entries before it checks `deficit_hours` (SKILL.md, Start session step 3).
 - `best_score` is the maximum over attempts. `status: "passed"` requires an attempt with `passed: true`.
 - Tasks with `ai_quality` weight 0 record it as `[0, 0]`.
 - Percentage of syllabus done = topics with status `taught` or `done`, plus passed tasks, divided by all non-cut topics and tasks.

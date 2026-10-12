@@ -6,6 +6,8 @@ course.schedule_overrides, sessions[], missed_days[], replans[]) and prints a JS
 
 deficit_hours counts only days after the latest replans[].absorbed_through, so hours a re-plan
 already absorbed don't trigger another one. raw_deficit_hours is the gap since the course start.
+unclosed_sessions lists past days whose session was never closed (status not "done", or no
+actual_hours). Those count as 0 h done, so close them before trusting deficit_hours.
 
     python3 tools/course_calendar.py                 # today
     python3 tools/course_calendar.py --date 2026-10-20 --compact
@@ -89,6 +91,13 @@ def summarize(progress: dict, today: date) -> dict:
     done_unabsorbed = sum(
         float(s.get("actual_hours") or 0) for s in sessions if after < s["date"] < today.isoformat()
     )
+    unclosed = sorted(
+        {
+            s["date"]
+            for s in sessions
+            if s["date"] < today.isoformat() and (s.get("status") != "done" or s.get("actual_hours") is None)
+        }
+    )
 
     remaining_from = max(today, start)
     remaining_by_week = []
@@ -128,6 +137,7 @@ def summarize(progress: dict, today: date) -> dict:
         "raw_deficit_hours": round(planned_before_today - done_before_today, 2),
         "absorbed_through": after or None,
         "deficit_hours": round(planned_unabsorbed - done_unabsorbed, 2),
+        "unclosed_sessions": unclosed,
         "remaining_hours_including_today": sum(r["remaining_hours"] for r in remaining_by_week),
         "remaining_by_week": remaining_by_week,
     }

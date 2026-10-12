@@ -80,18 +80,19 @@ With no argument or an unknown one, give a three-line status and list these comm
 
 1. **Load state.** Read `private/progress.json`; use the injected calendar (re-run it if stale). Record the start time.
 2. **Env guard.** Run `[ -n "${ANTHROPIC_API_KEY:-}" ] && echo "ANTHROPIC_API_KEY is SET in this environment" || echo "ANTHROPIC_API_KEY unset"`. If it's set, warn: Claude Code may be billing the Console key instead of Max, and Agent SDK exercises would bill it too. Point to the fix in reference/models-and-costs.md. Never print the value.
-3. **Branch on state**, in this order:
+3. **Close unfinished sessions.** If the calendar lists `unclosed_sessions`, an earlier session stopped without `end session` and counts as 0 h done, which inflates `deficit_hours`. Close each one as [End session](#end-session) steps 1–2 would. For actual hours, use `start` to `end` if both are recorded; otherwise propose an estimate (for example from the last commit that day: `git log`, `git -C private log`) and confirm it with the student. Set `status: "done"`, fill in `covered` and `tasks_touched` as far as you can tell, and add a `notes` line saying it was closed late and how the hours were found. Write and validate `private/progress.json`, commit each repo that changed (`session(<that date>): close`), then re-run `python3 tools/course_calendar.py --compact` and use its values from here on.
+4. **Branch on state**, in this order:
    - **Course not started** (before 2026-10-10): offer the setup checklist from reference/models-and-costs.md and a preview of week 1. Run the diagnostic early only if the student wants to.
    - **Diagnostic not done**: run [reference/diagnostic.md](reference/diagnostic.md) and write its summary to `private/diagnostic.md`, then write `syllabus.md` from [reference/curriculum.md](reference/curriculum.md) adjusted to the results. Show the adjustments, take one round of edits, set `syllabus.approved`, then commit. Then do the week 1 kickoff and start lesson 1 with the time left.
-   - **New missed days, or `deficit_hours ≥ 2`**: append them to `missed_days`, run [reference/replanning.md](reference/replanning.md) automatically, and tell the student what was cut, compressed or moved before continuing.
+   - **New missed days, or `deficit_hours ≥ 2`** (checked only once `unclosed_sessions` is empty): append them to `missed_days`, run [reference/replanning.md](reference/replanning.md) automatically, and tell the student what was cut, compressed or moved before continuing.
    - **First session of a course week** (no `lessons/week-NN/README.md` yet): do the [week kickoff](#week-kickoff).
-4. **Brief (15 lines at most):** where they are (week, day, topic, % of syllabus done, average best score); today's agenda with minutes per segment, summing to today's hours; what to review (open weak areas, unpassed tasks, topics due for spaced review); API spend this month vs the $20 budget (`python3 tools/spend.py`, plus the last Console figure the student gave).
-5. **Run the agenda.** Default shape:
+5. **Brief (15 lines at most):** where they are (week, day, topic, % of syllabus done, average best score); today's agenda with minutes per segment, summing to today's hours; what to review (open weak areas, unpassed tasks, topics due for spaced review); API spend this month vs the $20 budget (`python3 tools/spend.py`, plus the last Console figure the student gave).
+6. **Run the agenda.** Default shape:
    - **Recap quiz** (about 10 min, 3–5 questions; skip in the very first session): see [Quiz](#quiz).
    - **Lesson**: write `lessons/week-NN/dD-<slug>.md` now, from that day's outline in the week plan, adapted to the latest results. Follow [reference/lessons.md](reference/lessons.md). Teach it in chunks in the chat: short explanation, Java bridge, a runnable example the student runs (`uv run lessons/week-NN/examples/<file>.py`), then a check question. Don't paste the whole file.
    - **Hands-on**: scaffold the topic's task ([reference/tasks.md](reference/tasks.md)) or continue the open one. The student codes; you answer questions without writing their solution.
    - **What's next**: what the next session covers, and when.
-6. Add a `sessions[]` entry (`status: "in_progress"`, start time, planned hours) right after the brief.
+7. Add a `sessions[]` entry (`status: "in_progress"`, start time, planned hours) right after the brief.
 
 ## Week kickoff
 
@@ -135,7 +136,7 @@ Record each hint in `tasks[id].hints` (`{date, level, about}`). Hints don't chan
 
 ## Status
 
-Compact report: week/day and days left; current topic; syllabus completion %; tasks table (id, status, best score, attempts); average best score; open weak areas; missed days and hour deficit; API spend this month and in total vs budget; on-track verdict and the single most useful next action.
+Compact report: week/day and days left; current topic; syllabus completion %; tasks table (id, status, best score, attempts); average best score; open weak areas; missed days and hour deficit (if `unclosed_sessions` is non-empty, say those days count as 0 h until closed, and offer to close them); API spend this month and in total vs budget; on-track verdict and the single most useful next action.
 
 ## End session
 
