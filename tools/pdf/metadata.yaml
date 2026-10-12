@@ -1,0 +1,7 @@
+papersize: us-letter
+margin:
+  x: 1.9cm
+  y: 2cm
+mainfont: "Helvetica Neue"
+fontsize: 10pt
+linkcolor: "#1a5fb4"

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Blocks commits that would leak secrets or private course state. Enable once per clone:
+#   git config core.hooksPath .githooks
+#   git -C private config core.hooksPath ../.githooks
+set -u
+
+fail=0
+while IFS= read -r path; do
+  case "$path" in
+    *.env.example) ;;
+    .env|*/.env|.env.*|*/.env.*)
+      echo "pre-commit: refusing to commit secrets file: $path" >&2
+      fail=1 ;;
+    private/*)
+      echo "pre-commit: refusing to commit private course state to the public repo: $path" >&2
+      fail=1 ;;
+  esac
+done < <(git diff --cached --name-only --diff-filter=ACMR)
+
+# No pipefail here: grep -q exiting early must not mask a match.
+if git diff --cached -U0 --diff-filter=ACMR | grep -E '^\+' \
+  | grep -qE '(sk-ant-[A-Za-z0-9_-]{20,}|(^|[^A-Za-z0-9])pa-[A-Za-z0-9_-]{30,}|-----BEGIN [A-Z ]*PRIVATE KEY-----)'; then
+  echo "pre-commit: staged changes contain what looks like an API key or private key." >&2
+  echo "Move it to .env (gitignored) and load it at runtime." >&2
+  fail=1
+fi
+
+exit $fail

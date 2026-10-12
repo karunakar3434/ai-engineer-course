@@ -1,0 +1,39 @@
+# Secrets: never commit
+.env
+.env.*
+!.env.example
+
+# Python / uv
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+
+# Local API usage log (per-call token and cost records)
+.usage/
+
+# Personal course state (progress, scores, diagnostic, grading reports): its own private repo
+private/
+/progress.json
+
+# Local data, models and caches
+data/cache/
+*.sqlite3-journal
+.chroma/
+
+# Editors / OS
+.DS_Store
+.idea/
+.claude/settings.local.json
+.claude/*.lock
+
+# Scratch projects from lessons
+playground/
