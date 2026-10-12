@@ -33,7 +33,7 @@ Goal: write and run idiomatic Python with uv, and build a streaming log-analysis
 
 | Task ID | Task | Hours | Est. API cost |
 |:--|:--|:--|:--|
-| `w01-t1` | log-insights: streaming access-log stats CLI (generators, Counter, dataclasses, argparse). Weights 50/30/20/0 | 4 (3 h in week 1, 1 h in week 2) | $0 |
+| `w01-t1` | log-insights: streaming access-log stats CLI (generators, Counter, dataclasses, argparse). Weights 50/30/20/0 | 4 (moved to week 2, from day 1) | $0 |
 
 ### Week 2 (10-17 – 10-23): Python for Java developers II
 Goal: write tested, typed, concurrent Python.
@@ -47,7 +47,7 @@ Goal: write tested, typed, concurrent Python.
 
 | Task ID | Task | Hours | Est. API cost |
 |:--|:--|:--|:--|
-| `w01-t1` | finish and submit | 1 | $0 |
+| `w01-t1` | scaffold, build and submit (moved from week 1) | 4 | $0 |
 | `w02-t1` | async-fetcher: concurrent fetcher with a concurrency limit, retries with backoff and timeouts, tested with a fake transport. Weights 50/30/20/0 | 3 | $0 |
 
 ### Week 3 (10-24 – 10-30): Python services: Pydantic, FastAPI, data access
@@ -183,7 +183,7 @@ Goal: ship a containerized, streaming, cost-controlled LLM service, and know whe
 See [Capstone](#capstone). New Year's Day (Fri 01-01) falls in week 12. Declare any days off early so the plan can take them into account.
 
 ### Week 14 (2027-01-09 – 01-15): Portfolio and interview prep
-Interview prep 8 h (LLM system design, Python drills, concept questions, career story, 2–3 mock interviews), portfolio polish 4 h, buffer 6 h.
+Interview prep 8 h (LLM system design, Python drills, concept questions, career story, 2–3 mock interviews), portfolio polish 4 h, buffer 4.5 h.
 
 ## Capstone
 
@@ -205,3 +205,4 @@ Required components: FastAPI service; hybrid retrieval with reranking; at least 
 | 2026-10-11 | v1 written from the default curriculum and the diagnostic (13 weeks, with compressions to absorb the missed day) | First session |
 | 2026-10-11 | v2: course extended to 14 weeks (ends 2027-01-15); all compressions, the task merge and the P3 cut reverted; new week 3 (`w02-py-practical`, `w03-py-data-access`, `w03-t2` feed-digest); later weeks renumbered +1; missed 2026-10-10 absorbed by the extra week | Student: no compression, expansion welcome, about 3 months is fine |
 | 2026-10-11 | Machine updated to an M5 Pro with 24 GB RAM (was 8 GB); `w06-embeddings` no longer limited to the smallest local models | Student's Mac was replaced |
+| 2026-10-12 | Re-plan: 1.5 h of 10-11's plan shifted forward. `w01-t1` moves fully to week 2 (scaffolded on day 1) with the last 40 min of `w01-py-collections`; final-week buffer 6 h → 4.5 h | 1.5 h of 10-11's plan not reached; no topics compressed |
