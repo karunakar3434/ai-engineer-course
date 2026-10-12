@@ -38,6 +38,8 @@ git -C private config core.hooksPath ../.githooks
 cp .env.example .env              # add keys from week 3; .env is gitignored
 ```
 
+Each course session runs in its own git worktree and reaches `private/` through a link to the main checkout. To let sessions write it without permission prompts, add the main checkout's `private/` folder to `permissions.additionalDirectories` in `~/.claude/settings.json`.
+
 - Tasks: `cd tasks/<task> && uv run pytest`
 - Paid API tests: `uv run --env-file ../../.env pytest --live`
 - Revision PDFs: `python3 tools/build_pdf.py --all --combined`
