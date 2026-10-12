@@ -2,7 +2,12 @@
 """Course calendar: where the course is today, how much time is left, which days were missed.
 
 Reads private/progress.json (course.start_date, course.total_weeks, course.session_hours,
-course.schedule_overrides, sessions[], missed_days[]) and prints a JSON summary.
+course.schedule_overrides, sessions[], missed_days[], replans[]) and prints a JSON summary.
+
+deficit_hours counts only days after the latest replans[].absorbed_through, so hours a re-plan
+already absorbed don't trigger another one. raw_deficit_hours is the gap since the course start.
+unclosed_sessions lists past days whose session was never closed (status not "done", or no
+actual_hours). Those count as 0 h done, so close them before trusting deficit_hours.
 
     python3 tools/course_calendar.py                 # today
     python3 tools/course_calendar.py --date 2026-10-20 --compact
@@ -39,6 +44,17 @@ def days(start: date, end: date) -> Iterator[date]:
         current += timedelta(days=1)
 
 
+def absorbed_through(replans: list[dict], today: date) -> date | None:
+    """Last day a re-plan absorbed. An entry without absorbed_through covers up to the day before its date."""
+    covered = [
+        date.fromisoformat(r["absorbed_through"]) if r.get("absorbed_through")
+        else date.fromisoformat(r["date"]) - timedelta(days=1)
+        for r in replans
+        if r["date"] <= today.isoformat()
+    ]
+    return max(covered, default=None)
+
+
 def summarize(progress: dict, today: date) -> dict:
     course = progress["course"]
     start = date.fromisoformat(course["start_date"])
@@ -68,6 +84,19 @@ def summarize(progress: dict, today: date) -> dict:
     planned_before_today = sum(planned_hours(d, course) for d in past_days)
     done_before_today = sum(
         float(s.get("actual_hours") or 0) for s in sessions if s["date"] < today.isoformat()
+    )
+    absorbed = absorbed_through(progress.get("replans", []), today)
+    after = absorbed.isoformat() if absorbed else ""
+    planned_unabsorbed = sum(planned_hours(d, course) for d in past_days if d.isoformat() > after)
+    done_unabsorbed = sum(
+        float(s.get("actual_hours") or 0) for s in sessions if after < s["date"] < today.isoformat()
+    )
+    unclosed = sorted(
+        {
+            s["date"]
+            for s in sessions
+            if s["date"] < today.isoformat() and (s.get("status") != "done" or s.get("actual_hours") is None)
+        }
     )
 
     remaining_from = max(today, start)
@@ -105,7 +134,10 @@ def summarize(progress: dict, today: date) -> dict:
         "new_missed_days": [m for m in missed if m["date"] not in recorded_missed],
         "hours_planned_before_today": planned_before_today,
         "hours_done_before_today": done_before_today,
-        "deficit_hours": round(planned_before_today - done_before_today, 2),
+        "raw_deficit_hours": round(planned_before_today - done_before_today, 2),
+        "absorbed_through": after or None,
+        "deficit_hours": round(planned_unabsorbed - done_unabsorbed, 2),
+        "unclosed_sessions": unclosed,
         "remaining_hours_including_today": sum(r["remaining_hours"] for r in remaining_by_week),
         "remaining_by_week": remaining_by_week,
     }

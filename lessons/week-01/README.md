@@ -26,13 +26,13 @@ Success criteria:
 |:--|:--|:--|:--|:--|:--|
 | d1 | 10-10 | Sat | 0 (missed) | – | – |
 | d2 | 10-11 | Sun | 3 | diagnostic, `w01-py-tooling` | diagnostic and syllabus 90 · tooling part 1 75 · wrap 15 |
-| d3 | 10-12 | Mon | 3 | `w01-py-tooling`, `w01-py-core` | recap quiz 15 · **finish d2 lesson (sections 1–5) 70** · tooling part 2 70 · core part 1 20 · wrap 5 *(updated 10-11: d2 lesson carried over; the start-of-session re-plan moves the remaining core time)* |
-| d4 | 10-13 | Tue | 2 | `w01-py-core` | recap quiz 15 · core part 2 100 · wrap 5 |
-| d5 | 10-14 | Wed | 2 | `w01-py-core`, `w01-py-collections` | recap quiz 15 · core part 3 80 · collections part 1 20 · wrap 5 |
-| d6 | 10-15 | Thu | 2 | `w01-py-collections` | recap quiz 15 · collections part 2 100 · wrap 5 |
-| d7 | 10-16 | Fri | 3 | `w01-py-collections`, `w01-t1` | weekly review quiz 25 · collections part 3 100 · w01-t1 scaffold and start 50 · wrap 5 |
+| d3 | 10-12 | Mon | 3 | `w01-py-tooling`, `w01-py-core` | recap quiz 15 · **finish d2 lesson (sections 1–5) 70** · tooling part 2 70 · core part 1 20 · wrap 5 *(re-planned 10-12)* |
+| d4 | 10-13 | Tue | 2 | `w01-py-core` | recap quiz 15 · core part 1 (rest) 50 · core part 2 50 · wrap 5 |
+| d5 | 10-14 | Wed | 2 | `w01-py-core` | recap quiz 15 · core part 2 (rest) 50 · core part 3 50 · wrap 5 |
+| d6 | 10-15 | Thu | 2 | `w01-py-core`, `w01-py-collections` | recap quiz 15 · core part 3 (rest) 50 · collections part 1 50 · wrap 5 |
+| d7 | 10-16 | Fri | 3 | `w01-py-collections` | weekly review quiz 25 · collections part 2 100 · collections part 3 50 · wrap 5 |
 
-Carried into week 2: about 3 h of `w01-t1` (1 h was already planned there). Week 2 absorbs this with its slack, and week 3 has 1.5 h spare.
+Carried into week 2 (re-planned 10-12): all of `w01-t1` (4 h, scaffolded on week 2 day 1) and the last 40 min of `w01-py-collections` part 3 (sorting and copying). Everything after shifts about 1.5 h later, the final-week buffer drops from 6 h to 4.5 h, and the week 2 kickoff sets the week 2/3 split. No topic is compressed. The session outlines below keep their original day grouping; the schedule table is authoritative.
 
 ## Session outlines
 
@@ -89,7 +89,7 @@ Carried into week 2: about 3 h of `w01-t1` (1 h was already planned there). Week
 
 | ID | Title | Hours | Est. API cost | Model | Weights (C/Q/D/AI) |
 |:--|:--|:--|:--|:--|:--|
-| `w01-t1` | log-insights: streaming access-log stats CLI | 4 (≈1 h this week, 3 h week 2 d1) | $0.00 (offline) | – | 50/30/20/0 |
+| `w01-t1` | log-insights: streaming access-log stats CLI | 4 (all in week 2, from day 1) | $0.00 (offline) | – | 50/30/20/0 |
 
 ## Docs verified
 

@@ -37,3 +37,6 @@ data/cache/
 
 # Scratch projects from lessons
 playground/
+
+# Claude Code worktrees
+.claude/worktrees/
