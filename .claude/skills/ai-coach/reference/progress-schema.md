@@ -83,16 +83,28 @@ Single source of truth for course state, at `~/ai-engineer-course/private/progre
 
   "sessions": [
     {
-      "date": "2026-10-10", "start": "09:05", "end": "12:10",
-      "planned_hours": 3, "actual_hours": 3.1,
-      "status": "done",                  // in_progress | done
+      "date": "2026-10-10", "start": "09:05", "end": "12:10",   // first segment's start, last segment's end
+      "segments": [ { "start": "09:05", "end": "10:20" }, { "start": "10:40", "end": "12:10" } ],
+      "planned_hours": 3, "actual_hours": 2.75,                 // sum of segments, nearest 0.25 h
+      "status": "done",                  // in_progress | paused | done
       "week": 1, "day": 1,
       "covered": ["diagnostic", "w01-py-tooling"],
       "quiz": null,                      // or index into quiz_history
       "tasks_touched": [],
+      "resume": null,                    // written by pause session, see below
       "notes": "..."
     }
   ],
+  // sessions[].resume while status is "paused":
+  // {
+  //   "paused_at": "10:20",
+  //   "lesson_file": "lessons/week-01/d4-strings-match-functions.md",
+  //   "section": "3. Functions: defaults evaluated once",
+  //   "last_step": "explained the None-sentinel fix; asked for a prediction",
+  //   "pending": "Predict the output of calling append_to(1) twice",   // word for word, or null
+  //   "agenda_left": [ { "segment": "core part 2 (rest)", "minutes": 30 }, { "segment": "wrap", "minutes": 5 } ],
+  //   "notes": "student wants to revisit keyword-only parameters"
+  // }
 
   "quiz_history": [
     {
@@ -138,7 +150,9 @@ Single source of truth for course state, at `~/ai-engineer-course/private/progre
 
 - Append to history arrays (`attempts`, `sessions`, `quiz_history`, `replans`, `missed_days`); never rewrite or delete past entries. Fix mistakes with a new entry or a `notes` field.
 - `replans[].absorbed_through` marks the shortfall up to that day as absorbed: yesterday for a re-plan before today's session, today if today's hours were already logged. `tools/course_calendar.py` reports `deficit_hours` from the days after the latest `absorbed_through` only, plus `raw_deficit_hours` (planned minus done since the start) and `absorbed_through`. An entry without the field counts as absorbing up to the day before its `date`. Same-day re-plans that supersede each other share one `absorbed_through`, so nothing is counted twice.
-- A `sessions[]` entry stays `in_progress` with `actual_hours: null` until `end session` closes it. If a session stops without one, the calendar counts that day as 0 h done and lists its date in `unclosed_sessions` (past entries whose `status` isn't `done` or whose `actual_hours` is null). Start session closes those entries before it checks `deficit_hours` (SKILL.md, Start session step 3).
+- A `sessions[]` entry is `in_progress` while the student studies, `paused` after `pause session`, and `done` after `end session`. Each stretch of study is one `segments[]` item, and `actual_hours` is their sum, written at every pause and at the end, so the calendar counts a paused day's hours. An entry without `segments` (from before pausing existed) counts as one segment from `start` to `end`.
+- If a session stops without a pause or an end, `actual_hours` stays null, the calendar counts that day as 0 h done, and it lists the date in `unclosed_sessions` (past entries that aren't `paused` or `done`, or have no `actual_hours`). Start session closes those entries before it checks `deficit_hours` (SKILL.md, Start session step 3).
+- The calendar lists the dates of `paused` entries, today's included, in `paused_sessions`. Continue session reopens today's and closes earlier ones (SKILL.md, Continue session).
 - `best_score` is the maximum over attempts. `status: "passed"` requires an attempt with `passed: true`.
 - Tasks with `ai_quality` weight 0 record it as `[0, 0]`.
 - Percentage of syllabus done = topics with status `taught` or `done`, plus passed tasks, divided by all non-cut topics and tasks.
