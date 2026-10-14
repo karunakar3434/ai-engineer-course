@@ -27,12 +27,12 @@ Success criteria:
 | d1 | 10-10 | Sat | 0 (missed) | – | – |
 | d2 | 10-11 | Sun | 3 | diagnostic, `w01-py-tooling` | diagnostic and syllabus 90 · tooling part 1 75 · wrap 15 |
 | d3 | 10-12 | Mon | 3 | `w01-py-tooling`, `w01-py-core` | recap quiz 15 · **finish d2 lesson (sections 1–5) 70** · tooling part 2 70 · core part 1 20 · wrap 5 *(re-planned 10-12)* |
-| d4 | 10-13 | Tue | 2 | `w01-py-core` | recap quiz 15 · core part 1 (rest) 50 · core part 2 50 · wrap 5 |
-| d5 | 10-14 | Wed | 2 | `w01-py-core` | recap quiz 15 · core part 2 (rest) 50 · core part 3 50 · wrap 5 |
-| d6 | 10-15 | Thu | 2 | `w01-py-core`, `w01-py-collections` | recap quiz 15 · core part 3 (rest) 50 · collections part 1 50 · wrap 5 |
-| d7 | 10-16 | Fri | 3 | `w01-py-collections` | weekly review quiz 25 · collections part 2 100 · collections part 3 50 · wrap 5 |
+| d4 | 10-13 | Tue | 0 (missed) | – | – |
+| d5 | 10-14 | Wed | 2 | `w01-py-tooling` | recap quiz 15 · finish d2 lesson (sections 4–5) 25 · tooling part 2 70 · wrap 5 *(re-planned 10-14)* |
+| d6 | 10-15 | Thu | 2 | `w01-py-core` | recap quiz 15 · core part 1 70 · core part 2 30 · wrap 5 *(re-planned 10-14)* |
+| d7 | 10-16 | Fri | 3 | `w01-py-core` | weekly review quiz 25 · core part 2 (rest) 70 · core part 3 80 · wrap 5 *(re-planned 10-14)* |
 
-Carried into week 2 (re-planned 10-12): all of `w01-t1` (4 h, scaffolded on week 2 day 1) and the last 40 min of `w01-py-collections` part 3 (sorting and copying). Everything after shifts about 1.5 h later, the final-week buffer drops from 6 h to 4.5 h, and the week 2 kickoff sets the week 2/3 split. No topic is compressed. The session outlines below keep their original day grouping; the schedule table is authoritative.
+Carried into week 2 (re-planned 10-12, then 10-14 after the missed Tuesday): the last 20 min of `w01-py-core` part 3, all of `w01-py-collections` (parts 1–3, about 3.3 h), and all of `w01-t1` (4 h, scaffolded once collections is done, since it needs generators and `Counter`). Everything after shifts about 5 h later in total, the final-week buffer drops from 6 h to 1 h, and the week 2 kickoff sets the week 2/3 split. No topic is compressed. The session outlines below keep their original day grouping; the schedule table is authoritative.
 
 ## Session outlines
 
