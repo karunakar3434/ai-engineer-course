@@ -35,6 +35,8 @@ Goal: write and run idiomatic Python with uv, and build a streaming log-analysis
 |:--|:--|:--|:--|
 | `w01-t1` | log-insights: streaming access-log stats CLI (generators, Counter, dataclasses, argparse). Weights 50/30/20/0 | 4 (moved to week 2, from day 1) | $0 |
 
+Re-planned 10-14: `w01-py-collections` (all three parts) and the last 20 min of `w01-py-core` move to the start of week 2, before `w01-t1`.
+
 ### Week 2 (10-17 – 10-23): Python for Java developers II
 Goal: write tested, typed, concurrent Python.
 
@@ -183,7 +185,7 @@ Goal: ship a containerized, streaming, cost-controlled LLM service, and know whe
 See [Capstone](#capstone). New Year's Day (Fri 01-01) falls in week 12. Declare any days off early so the plan can take them into account.
 
 ### Week 14 (2027-01-09 – 01-15): Portfolio and interview prep
-Interview prep 8 h (LLM system design, Python drills, concept questions, career story, 2–3 mock interviews), portfolio polish 4 h, buffer 4.5 h.
+Interview prep 8 h (LLM system design, Python drills, concept questions, career story, 2–3 mock interviews), portfolio polish 4 h, buffer 1 h.
 
 ## Capstone
 
@@ -206,3 +208,4 @@ Required components: FastAPI service; hybrid retrieval with reranking; at least 
 | 2026-10-11 | v2: course extended to 14 weeks (ends 2027-01-15); all compressions, the task merge and the P3 cut reverted; new week 3 (`w02-py-practical`, `w03-py-data-access`, `w03-t2` feed-digest); later weeks renumbered +1; missed 2026-10-10 absorbed by the extra week | Student: no compression, expansion welcome, about 3 months is fine |
 | 2026-10-11 | Machine updated to an M5 Pro with 24 GB RAM (was 8 GB); `w06-embeddings` no longer limited to the smallest local models | Student's Mac was replaced |
 | 2026-10-12 | Re-plan: 1.5 h of 10-11's plan shifted forward. `w01-t1` moves fully to week 2 (scaffolded on day 1) with the last 40 min of `w01-py-collections`; final-week buffer 6 h → 4.5 h | 1.5 h of 10-11's plan not reached; no topics compressed |
+| 2026-10-14 | Re-plan: 3.5 h shifted forward. `w01-py-collections` and the last 20 min of `w01-py-core` move to the start of week 2, before `w01-t1`; final-week buffer 4.5 h → 1 h. The next shortfall extends the end date | Tue 10-13 missed and 1.5 h of 10-12's plan not reached; no topics compressed |
